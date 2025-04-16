@@ -17,7 +17,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     "colab.research.google.com",
-    "*.codatalab-user-runtimes.internal",
+    "*.codatalab-user-runtimes.internal:8007",
 ]
 
 
