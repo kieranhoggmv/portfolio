@@ -1,7 +1,77 @@
+<style>
+    .row {
+        display: flex;
+    }
+    /* .col {
+        flex: 50%;
+    } */
+     .Heading_2 {
+        font-size: 150%;
+     }
+     .Heading_3 {
+        font-style: 135%;
+     }
+     .Heading_4 {
+        font-size: 125%;
+     }
+     .List_Paragraph {
+        list-style-type: circle;
+     }
+</style>
+
+{% if ksbs %}
+<!-- <h2>Overview</h2>
+{% for ksb in met_ksbs %}
+<li>{{ ksb }} ✅</li>
+{% endfor %}
+{% for ksb in missing_ksbs %}
+<li>{{ ksb }} ❌</li>
+{% endfor %} -->
+<div class="row">
+    <div class="col" style="width: 50%">
+        <h2>Content</h2>
+        {% for p in paragraphs %}
+        {% if p.0|length > 0 %}
+            {% ifchanged p.1 %}
+                </ul>
+                {% if p.1 == "List_Paragraph" %}
+                <ul>
+                {% endif %}
+            {% endifchanged %}
+            {% if p.1 == "List_Paragraph" %}<li>{%endif %}
+            
+            <a name="{{ forloop.counter0 }}"></a>
+            <p class="{{ p.1}}">{{ p.0 }}</p>
+            {% if p.1 == "List_Paragraph" %}</li>{%endif %}
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="col" style="position:fixed; overflow-y: scroll; height: 500px; width: 50%; right: 0">
+    <h2>Detail</h2>
+    <table style="border: 1px solid black">
+    {% for ksb, contents in ksbs.items %}
+    <tr>
+        <th style="border: 1px solid black">{{ ksb }}</th>
+        </tr>
+    <tr><td style="border: 1px solid black">
+        {% for loc, text in contents.items %}
+        {%ifchanged text.1 %}
+        <h3>{{ text.1 }}</h3>
+        {% endifchanged %}
+        <p>{{ text.0 }}</p>
+        <a href="#{{ loc }}">View</a>
+        {% endfor %}</td>
+    </tr>
+    {% endfor %}
+    </table>
+</div>
+</div>
+{% else %}
 <h1>Upload</h1>
 <form action="" method="post" enctype="multipart/form-data">
 {% csrf_token %}
-
     <input type="file" name="file"/>
     <input type="submit" />
 </form>
+
+{% endif %}
