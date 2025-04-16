@@ -57,6 +57,8 @@ class Home(TemplateView):
                     or f"({key})" in paragraph.text
                     or f"/{key}" in paragraph.text
                     or f"{key}/" in paragraph.text
+                    or f"{key}+" in paragraph.text
+                    or f"{key}]" in paragraph.text
                 ):
                     # if previous_paragraph:
                     #     KSBS[key]["paragraphs"].append(previous_paragraph.text)
