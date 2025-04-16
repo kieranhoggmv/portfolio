@@ -21,7 +21,9 @@ ALLOWED_HOSTS = [
     ".prod.colab.dev",
 ]
 
-
+CSRF_TRUSTED_ORIGINS = [
+    ".prod.colab.dev",
+]
 # Application definition
 
 INSTALLED_APPS = [
