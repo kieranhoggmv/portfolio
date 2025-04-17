@@ -1,9 +1,11 @@
+import base64
+import json
 from pprint import pprint
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from docx import Document
-
+import zipfile
 
 KSBS = {
     "K1": {},
@@ -34,15 +36,38 @@ class Home(TemplateView):
 
     def post(self, request, *args, **kwargs):
         PROJECT_STYLE = "Heading 2"
+
+        z = zipfile.ZipFile(request.FILES["file"].file)
+        all_files = z.namelist()
+
+        images = list(filter(lambda x: x.startswith("word/media/"), all_files))
+        image_strings = []
+        for image in images:
+            filename = image.replace("word/media/", "")
+            img = z.open(image).read()
+            f = open(rf"images/{filename}", "wb")
+            # f.write(img)
+            image_strings.append(base64.b64encode(img))
+
+            # z.extract(image, r"images")
         document = Document(request.FILES["file"].file)
-        paragraphs = [
-            (para.text, para.style.name.replace(" ", "_"))
-            for para in document.paragraphs
-        ]
+        # paragraphs = [
+        #     (para.text, para.style.name.replace(" ", "_"))
+        #     for para in document.paragraphs
+        # ]
+        paragraphs = []
         projects = []
         project = None
         # previous_paragraph = None
+        img = 1
         for i, paragraph in enumerate(document.paragraphs):
+            if paragraph._p.xpath(
+                "./w:r/w:drawing/*[self::wp:inline | self::wp:anchor]/a:graphic/a:graphicData/pic:pic"
+            ):
+                image = image_strings[img - 1].decode("utf-8")
+                img += 1
+            else:
+                image = None
             for run in paragraph.runs:
                 if run.font.italic:
                     print(run.text)
@@ -50,7 +75,9 @@ class Home(TemplateView):
                 if paragraph.text != project:
                     project = paragraph.text
                     projects.append(project)
-
+            paragraphs.append(
+                (paragraph.text, paragraph.style.name.replace(" ", "_"), image)
+            )
             for key in KSBS:
                 if (
                     f"[{key}]" in paragraph.text
@@ -68,6 +95,12 @@ class Home(TemplateView):
         # missing_ksbs = list(filter(lambda x: len(KSBS[x]) == 0, KSBS))
         # met_ksbs = list(filter(lambda x: x not in missing_ksbs, KSBS))
         # pprint(KSBS)
+        with open("df.json") as criteria_file:
+            criteria = json.loads(criteria_file.read())
+        for item in criteria:
+            if item["ksb"] in KSBS:
+                KSBS[item["ksb"]].update(item)
+        print(KSBS)
         return render(
             request,
             self.template_name,
@@ -76,5 +109,6 @@ class Home(TemplateView):
                 # "missing_ksbs": missing_ksbs,
                 # "met_ksbs": met_ksbs,
                 "paragraphs": paragraphs,
+                "criteria": criteria,
             },
         )
