@@ -1,11 +1,7 @@
 import base64
-import json
 import pickle
-from pprint import pprint
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from docx import Document
 import zipfile
 
 KSBS = {
