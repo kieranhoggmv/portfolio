@@ -844,7 +844,7 @@ sub {
         {% endfor %}
         <p><strong>Evidence found</strong></p>
         {% for loc, text in contents.items %}
-        {% if loc != "ksb" and loc != "description" and loc != "grading primer" and loc != "universal_criteria" and loc != "meet_expectations" and loc != "reconstructed exceed expectations criteria" and loc !=  "more work required feedback" and loc != "meets expectations feedback" and loc != "exceeds expectation feedback" %}
+        {% if loc != "ksb" and loc != "description" and loc != "grading primer" and loc != "universal_criteria" and loc != "meet_expectations" and loc != "reconstructed exceed expectations criteria" and loc !=  "more work required feedback" and loc != "meets expectations feedback" and loc != "exceeds expectation feedback" and loc != "old meets expectation" %}
         {% ifchanged text.1 %}
         <p><strong>{{ text.1 }}</strong></p>
         {% endifchanged %}
