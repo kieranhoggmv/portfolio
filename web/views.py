@@ -3,6 +3,7 @@ import pickle
 from django.shortcuts import render
 from django.views.generic import TemplateView
 import zipfile
+from docx import Document
 
 KSBS = {
     "K1": {},
@@ -40,9 +41,9 @@ class Home(TemplateView):
         images = list(filter(lambda x: x.startswith("word/media/"), all_files))
         image_strings = []
         for image in images:
-            filename = image.replace("word/media/", "")
+            # filename = image.replace("word/media/", "")
             img = z.open(image).read()
-            f = open(rf"images/{filename}", "wb")
+            # f = open(rf"images/{filename}", "wb")
             # f.write(img)
             image_strings.append(base64.b64encode(img))
 
