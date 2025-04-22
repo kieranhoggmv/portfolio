@@ -19,11 +19,12 @@ ALLOWED_HOSTS = [
     "colab.research.google.com",
     ".codatalab-user-runtimes.internal",
     ".prod.colab.dev",
+    ".onrender.com",
 ]
 
-CSRF_TRUSTED_ORIGINS = ["https://*.prod.colab.dev"]
-CSRF_ALLOWED_ORIGINS = ["https://*.prod.colab.dev"]
-CORS_ORIGINS_WHITELIST = ["https://*.prod.colab.dev"]
+CSRF_TRUSTED_ORIGINS = ["https://*.prod.colab.dev", "https://*.onrender.com"]
+CSRF_ALLOWED_ORIGINS = ["https://*.prod.colab.dev", "https://*.onrender.com"]
+CORS_ORIGINS_WHITELIST = ["https://*.prod.colab.dev", "https://*.onrender.com"]
 # Application definition
 
 INSTALLED_APPS = [
