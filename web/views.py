@@ -1,5 +1,6 @@
 import base64
 import json
+import pickle
 from pprint import pprint
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -95,8 +96,8 @@ class Home(TemplateView):
         # missing_ksbs = list(filter(lambda x: len(KSBS[x]) == 0, KSBS))
         # met_ksbs = list(filter(lambda x: x not in missing_ksbs, KSBS))
         # pprint(KSBS)
-        with open("df.json") as criteria_file:
-            criteria = json.loads(criteria_file.read())
+        criteria_file = open("data", "rb")
+        criteria = pickle.load(criteria_file)
         for item in criteria:
             if item["ksb"] in KSBS:
                 KSBS[item["ksb"]].update(item)
