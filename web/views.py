@@ -41,23 +41,15 @@ class Home(TemplateView):
         images = list(filter(lambda x: x.startswith("word/media/"), all_files))
         image_strings = []
         for image in images:
-            # filename = image.replace("word/media/", "")
             img = z.open(image).read()
-            # f = open(rf"images/{filename}", "wb")
-            # f.write(img)
             image_strings.append(base64.b64encode(img))
 
-            # z.extract(image, r"images")
         document = Document(request.FILES["file"].file)
-        # paragraphs = [
-        #     (para.text, para.style.name.replace(" ", "_"))
-        #     for para in document.paragraphs
-        # ]
         paragraphs = []
         projects = []
         project = None
-        # previous_paragraph = None
         img = 1
+
         for i, paragraph in enumerate(document.paragraphs):
             if paragraph._p.xpath(
                 "./w:r/w:drawing/*[self::wp:inline | self::wp:anchor]/a:graphic/a:graphicData/pic:pic"
@@ -68,7 +60,8 @@ class Home(TemplateView):
                 image = None
             for run in paragraph.runs:
                 if run.font.italic:
-                    print(run.text)
+                    # TODO
+                    pass
             if paragraph.style.name == PROJECT_STYLE and "#" in paragraph.text:
                 if paragraph.text != project:
                     project = paragraph.text
@@ -85,27 +78,18 @@ class Home(TemplateView):
                     or f"{key}+" in paragraph.text
                     or f"{key}]" in paragraph.text
                 ):
-                    # if previous_paragraph:
-                    #     KSBS[key]["paragraphs"].append(previous_paragraph.text)
                     if i not in KSBS[key].keys():
                         KSBS[key][i] = paragraph.text, project
-            # previous_paragraph = paragraph
-        # missing_ksbs = list(filter(lambda x: len(KSBS[x]) == 0, KSBS))
-        # met_ksbs = list(filter(lambda x: x not in missing_ksbs, KSBS))
-        # pprint(KSBS)
         criteria_file = open("data", "rb")
         criteria = pickle.load(criteria_file)
         for item in criteria:
             if item["ksb"] in KSBS:
                 KSBS[item["ksb"]].update(item)
-        print(KSBS)
         return render(
             request,
             self.template_name,
             {
                 "ksbs": KSBS,
-                # "missing_ksbs": missing_ksbs,
-                # "met_ksbs": met_ksbs,
                 "paragraphs": paragraphs,
                 "criteria": criteria,
             },
