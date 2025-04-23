@@ -794,19 +794,35 @@ sub {
         background-color: yellow;
         font-weight: 800;
      }
-     {% comment %} .inline-image:focus > img {
-        transform: scale(2);
-        margin-left: 10rem;
-        position: relative;
-    } {% endcomment %}
 </style>
+<script>
 
+  function feedback() {
+    document.getElementById("feedback-container").style.display = "block";
+    document.getElementById("right").style.position = "";
+    var box = document.getElementById("feedback");
+    
+    if (document.querySelectorAll('[data-met=false]').length > 0) {
+      box.innerHTML += "Missing KSBs:\n";
+      document.querySelectorAll('[data-met=false]').forEach(el => {
+        box.innerHTML += el.innerHTML + "\n";
+      });
+      box.innerHTML += "\n\n";
+    }
+    box.innerHTML += "**Missing grading criteria**"
+    var ksb = ""
+    document.querySelectorAll('.ksb:not(:checked)').forEach(el => {
+      var this_ksb = el.id.split("-")[0]
+      if (ksb == "" || ksb != this_ksb) {
+        box.innerHTML += "\n\n" + this_ksb + "\n";
+        ksb = this_ksb;
+      }
+      box.innerHTML += "- " + el.parentElement.textContent.trim() + "\n";
+    });
+  }
+  
+</script>
 {% if ksbs %}
-<h2>Summary</h2>
-<p>
-{% for ksb, contents in ksbs.items %}
-{{ ksb }} {% if contents %}✅{% else %}❌{% if not forloop.last %}•{% endif %}{% endif %}
-{% endfor %}
 <div class="row">
     <div class="col" style="width: 50%">
         <h2>Content</h2>
@@ -831,31 +847,47 @@ sub {
         {% endif %}
         {% endfor %}
     </div>
-    <div class="col" style="position:fixed; overflow-y: scroll; height: 500px; width: 50%; right: 0">
-    <h2>Detail</h2>
-    <table style="border: 1px solid black">
-    {% for ksb, contents in ksbs.items %}
-    <tr>
-        <th style="border: 1px solid black">{{ ksb }}: {{ contents.description }}</th>
+    <div class="col" id="right" style="position:fixed; width: 50%; right: 0">
+      <p>
+      {% for ksb, contents in ksbs.items %}
+      <span class="ksb-present" id="{{forloop.counter}}" data-met="{% if contents %}true{% else %}false{% endif %}">{{ ksb }}</span>{% if contents %}✅{% else %}❌{% endif %}{% if not forloop.last %}•{% endif %}
+      {% endfor %}
+      <div style="overflow-y: scroll; height: 70vh; border: 1px solid grey;">
+        <h2>Grading</h2>
+        <table style="border: 1px solid black">
+        {% for ksb, contents in ksbs.items %}
+        <tr>
+            <th style="border: 1px solid black">{{ ksb }}: {{ contents.description }}</th>
+            </tr>
+        <tr><td style="border: 1px solid black">
+            {% for criteria in contents.meet_expectations %}
+            <label>
+            <input type="checkbox" id="{{ ksb }}-{{ forloop.counter }}" class="ksb" /> {{ criteria }}
+            </label>
+            {% endfor %}
+            <hr />
+            <p><strong>Evidence found for this KSB:</strong></p>
+            {% for loc, text in contents.items %}
+              {% if loc != "ksb" and loc != "description" and loc != "grading primer" and loc != "universal_criteria" and loc != "meet_expectations" and loc != "reconstructed exceed expectations criteria" and loc !=  "more work required feedback" and loc != "meets expectations feedback" and loc != "exceeds expectation feedback" and loc != "old meets expectation" %}
+                {% ifchanged text.1 %}
+                  <p><strong>{{ text.1 }}</strong></p>
+                {% endifchanged %}
+                  <p>{{ text.0 }} <a class="evidence" href="#{{ loc }}">Go</a></p>
+              {% endif %}
+              {% empty %}
+              None
+            {% endfor %}
+          </td>
         </tr>
-    <tr><td style="border: 1px solid black">
-        {% for criteria in contents.meet_expectations %}
-        <input type="checkbox" id="{{ ksb }}-{{ forloop.counter }}"/> {{ criteria }}<br />
         {% endfor %}
-        <p><strong>Evidence found</strong></p>
-        {% for loc, text in contents.items %}
-        {% if loc != "ksb" and loc != "description" and loc != "grading primer" and loc != "universal_criteria" and loc != "meet_expectations" and loc != "reconstructed exceed expectations criteria" and loc !=  "more work required feedback" and loc != "meets expectations feedback" and loc != "exceeds expectation feedback" and loc != "old meets expectation" %}
-        {% ifchanged text.1 %}
-        <p><strong>{{ text.1 }}</strong></p>
-        {% endifchanged %}
-        <p>{{ text.0 }}</p>
-        <a href="#{{ loc }}">View</a>
-        {% endif %}
-        {% endfor %}</td>
-    </tr>
-    {% endfor %}
-    </table>
-</div>
+        </table>
+      </div>
+      <p><button onclick="feedback();">Generate feedback</button></p>
+      <div id="feedback-container" style="display:none">
+        <h2>Feedback</h2>
+      <textarea id="feedback" rows=10></textarea>
+      </div>
+    </div>
 </div>
 {% else %}
 <h1>Portfolio Checker</h1>
