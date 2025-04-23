@@ -45,6 +45,7 @@ class Home(TemplateView):
             image_strings.append(base64.b64encode(img))
 
         document = Document(request.FILES["file"].file)
+        request.FILES["file"].file.close()
         paragraphs = []
         projects = []
         project = None
@@ -69,6 +70,7 @@ class Home(TemplateView):
             paragraphs.append(
                 (paragraph.text, paragraph.style.name.replace(" ", "_"), image)
             )
+            # TODO: regex to catch edge cases
             for key in KSBS:
                 if (
                     f"[{key}]" in paragraph.text
